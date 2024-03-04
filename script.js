@@ -17,8 +17,11 @@ function start() {
 function tick() {
   // setup next tick
   setTimeout(tick, 500);
-  writeToCell(player.row, player.col, 0)
 
+  for(const part of queue) {
+    writeToCell(part.row, part.col, 0)
+  }
+  
   if(controls.right) {
     direction = 'right'
   } else if(controls.left) {
@@ -28,39 +31,65 @@ function tick() {
   } else if(controls.down) {
     direction = 'down'
   }
+
+  const head = {
+    row: queue[queue.length - 1].row,
+    col: queue[queue.length - 1].col
+  }
   
   switch(direction) {
     case 'left':
-      player.col--
-      if(player.col < 0 ) {
-          player.col = 9
+      head.col--
+      if(head.col < 0 ) {
+          head.col = 9
       }
       break;
     case 'right':
-      player.col++
-      if(player.col > 9) {
-        player.col = 0
+      head.col++
+      if(head.col > 9) {
+        head.col = 0
       }
       break;
     case 'up':
-      player.row--
-      if(player.row < 0) {
-        player.row = 9
+      head.row--
+      if(head.row < 0) {
+        head.row = 9
       }
       break;
     case 'down':
-      player.row++
-      if(player.row > 9) {
-        player.row = 0
+      head.row++
+      if(head.row > 9) {
+        head.row = 0
       }
       break;
   }
-  writeToCell(player.row, player.col, 1)
+
+  queue.push(head)
+  queue.shift()
+
+  for(const part of queue) {
+    writeToCell(part.row, part.col, 1)
+  }
+  
   // display the model in full
   displayBoard();
 }
 
 // ******** MODEL ********
+const queue = [
+  {
+    row: 5,
+    col: 5,
+  }, 
+  {
+    row: 5,
+    col: 6,
+  },
+  {
+    row: 5,
+    col: 7,
+  }
+]
 const model = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -75,10 +104,6 @@ const model = [
 ];
 
 let direction = 'left';
-const player = {
-  row: 5,
-  col: 5
-}
 
 function writeToCell(row, col, value) {
   model[row][col] = value;
